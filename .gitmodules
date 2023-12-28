@@ -1,0 +1,3 @@
+[submodule "marllib/patch/aircombat/JBSim/data"]
+	path = marllib/patch/aircombat/JBSim/data
+	url = https://github.com/JSBSim-Team/jsbsim.git

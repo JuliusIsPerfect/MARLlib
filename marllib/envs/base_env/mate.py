@@ -117,6 +117,8 @@ class RLlibMATE(MultiAgentEnv):
 
     def get_env_info(self):
         env_info = {
+            "space_act": self.action_space_target,
+            "space_obs": self.observation_space_target,
             "space_obs_camera": self.observation_space_camera,
             "space_act_camera": self.action_space_camera,
             "space_obs_target": self.observation_space_target,
