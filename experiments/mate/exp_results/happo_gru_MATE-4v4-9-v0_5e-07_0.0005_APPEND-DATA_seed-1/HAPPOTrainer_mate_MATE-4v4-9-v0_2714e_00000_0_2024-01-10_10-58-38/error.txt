@@ -1,0 +1,82 @@
+Failure # 1 (occurred at 2024-01-10_19-32-54)
+Traceback (most recent call last):
+  File "D:\envs\marllib\lib\site-packages\ray\tune\trial_runner.py", line 890, in _process_trial
+    results = self.trial_executor.fetch_result(trial)
+  File "D:\envs\marllib\lib\site-packages\ray\tune\ray_trial_executor.py", line 788, in fetch_result
+    result = ray.get(trial_future[0], timeout=DEFAULT_GET_TIMEOUT)
+  File "D:\envs\marllib\lib\site-packages\ray\_private\client_mode_hook.py", line 105, in wrapper
+    return func(*args, **kwargs)
+  File "D:\envs\marllib\lib\site-packages\ray\worker.py", line 1625, in get
+    raise value.as_instanceof_cause()
+ray.exceptions.RayTaskError(ValueError): [36mray::HAPPOTrainer.train()[39m (pid=13456, ip=127.0.0.1, repr=HAPPOTrainer)
+  File "D:\projs\MARLlib\marllib\marl\algos\core\CC\happo.py", line 92, in happo_surrogate_loss
+    iter_logits, iter_state = iter_model(iter_train_batch)
+  File "D:\envs\marllib\lib\site-packages\ray\rllib\models\modelv2.py", line 243, in __call__
+    res = self.forward(restored, state or [], seq_lens)
+  File "D:\projs\MARLlib\marllib\marl\models\zoo\rnn\base_rnn.py", line 152, in forward
+    output, hidden_state = self.forward_rnn(inputs, hidden_state, seq_lens)
+  File "D:\projs\MARLlib\marllib\marl\models\zoo\rnn\base_rnn.py", line 167, in forward_rnn
+    self._features, h = self.rnn(x, torch.unsqueeze(hidden_state[0], 0))
+  File "D:\envs\marllib\lib\site-packages\torch\nn\modules\module.py", line 1051, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "D:\envs\marllib\lib\site-packages\torch\nn\modules\rnn.py", line 837, in forward
+    result = _VF.gru(input, hx, self._flat_weights, self.bias, self.num_layers,
+RuntimeError: [enforce fail at ..\c10\core\CPUAllocator.cpp:79] data. DefaultCPUAllocator: not enough memory: you tried to allocate 20480000 bytes.
+
+The above exception was the direct cause of the following exception:
+
+[36mray::HAPPOTrainer.train()[39m (pid=13456, ip=127.0.0.1, repr=HAPPOTrainer)
+  File "python\ray\_raylet.pyx", line 558, in ray._raylet.execute_task
+  File "python\ray\_raylet.pyx", line 596, in ray._raylet.execute_task
+  File "python\ray\_raylet.pyx", line 565, in ray._raylet.execute_task
+  File "python\ray\_raylet.pyx", line 569, in ray._raylet.execute_task
+  File "python\ray\_raylet.pyx", line 519, in ray._raylet.execute_task.function_executor
+  File "D:\envs\marllib\lib\site-packages\ray\_private\function_manager.py", line 576, in actor_method_executor
+    return method(__ray_actor, *args, **kwargs)
+  File "D:\envs\marllib\lib\site-packages\ray\util\tracing\tracing_helper.py", line 451, in _resume_span
+    return method(self, *_args, **_kwargs)
+  File "D:\envs\marllib\lib\site-packages\ray\rllib\agents\trainer.py", line 682, in train
+    raise e
+  File "D:\envs\marllib\lib\site-packages\ray\rllib\agents\trainer.py", line 668, in train
+    result = Trainable.train(self)
+  File "D:\envs\marllib\lib\site-packages\ray\tune\trainable.py", line 283, in train
+    result = self.step()
+  File "D:\envs\marllib\lib\site-packages\ray\util\tracing\tracing_helper.py", line 451, in _resume_span
+    return method(self, *_args, **_kwargs)
+  File "D:\envs\marllib\lib\site-packages\ray\rllib\agents\trainer_template.py", line 206, in step
+    step_results = next(self.train_exec_impl)
+  File "D:\envs\marllib\lib\site-packages\ray\util\iter.py", line 756, in __next__
+    return next(self.built_iterator)
+  File "D:\envs\marllib\lib\site-packages\ray\util\iter.py", line 783, in apply_foreach
+    for item in it:
+  File "D:\envs\marllib\lib\site-packages\ray\util\iter.py", line 783, in apply_foreach
+    for item in it:
+  File "D:\envs\marllib\lib\site-packages\ray\util\iter.py", line 843, in apply_filter
+    for item in it:
+  File "D:\envs\marllib\lib\site-packages\ray\util\iter.py", line 843, in apply_filter
+    for item in it:
+  File "D:\envs\marllib\lib\site-packages\ray\util\iter.py", line 783, in apply_foreach
+    for item in it:
+  File "D:\envs\marllib\lib\site-packages\ray\util\iter.py", line 783, in apply_foreach
+    for item in it:
+  File "D:\envs\marllib\lib\site-packages\ray\util\iter.py", line 791, in apply_foreach
+    result = fn(item)
+  File "D:\envs\marllib\lib\site-packages\ray\rllib\execution\train_ops.py", line 230, in __call__
+    results = policy.learn_on_loaded_batch(
+  File "D:\envs\marllib\lib\site-packages\ray\rllib\policy\torch_policy.py", line 632, in learn_on_loaded_batch
+    return self.learn_on_batch(batch)
+  File "D:\envs\marllib\lib\site-packages\ray\rllib\utils\threading.py", line 21, in wrapper
+    return func(self, *a, **k)
+  File "D:\envs\marllib\lib\site-packages\ray\rllib\policy\torch_policy.py", line 529, in learn_on_batch
+    grads, fetches = self.compute_gradients(postprocessed_batch)
+  File "D:\envs\marllib\lib\site-packages\ray\rllib\policy\policy_template.py", line 336, in compute_gradients
+    return parent_cls.compute_gradients(self, batch)
+  File "D:\envs\marllib\lib\site-packages\ray\rllib\utils\threading.py", line 21, in wrapper
+    return func(self, *a, **k)
+  File "D:\envs\marllib\lib\site-packages\ray\rllib\policy\torch_policy.py", line 709, in compute_gradients
+    tower_outputs = self._multi_gpu_parallel_grad_calc(
+  File "D:\envs\marllib\lib\site-packages\ray\rllib\policy\torch_policy.py", line 1083, in _multi_gpu_parallel_grad_calc
+    raise last_result[0] from last_result[1]
+ValueError: [enforce fail at ..\c10\core\CPUAllocator.cpp:79] data. DefaultCPUAllocator: not enough memory: you tried to allocate 20480000 bytes.
+In tower 0 on device cpu
+

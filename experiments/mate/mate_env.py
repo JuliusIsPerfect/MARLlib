@@ -1,5 +1,5 @@
 # MIT License
-
+import numpy as np
 # Copyright (c) 2023 Replicable-MARL
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -41,27 +41,36 @@ class RLlibMATE(MultiAgentEnv):
         map = env_config["map_name"]
         env_config.pop("map_name", None)
         self.env = mate.make(map)
-        if not env_config["continuous_actions_camera"]:
-            self.env = mate.DiscreteCamera(self.env, levels=env_config["discrete_levels"])
-        if not env_config["continuous_actions_target"]:
-            self.env = mate.DiscreteTarget(self.env, levels=env_config["discrete_levels"])
-        self.action_space_camera = self.env.action_space.spaces[0].spaces[0]
-        self.action_space_target = self.env.action_space.spaces[1].spaces[0]
+        # if not env_config["continuous_actions_camera"]:
+        #     self.env = mate.DiscreteCamera(self.env, levels=env_config["discrete_levels"])
+        # if not env_config["continuous_actions_target"]:
+        #     self.env = mate.DiscreteTarget(self.env, levels=env_config["discrete_levels"])
+        if env_config["coop_team"] == "camera":
+            if not env_config["continuous_actions_camera"]:
+                self.env = mate.DiscreteCamera(self.env, levels=env_config["discrete_levels"])
+            self.env = mate.MultiCamera(self.env, target_agent=mate.agents.GreedyTargetAgent(seed=0))
+        else:  # target
+            if not env_config["continuous_actions_target"]:
+                self.env = mate.DiscreteTarget(self.env, levels=env_config["discrete_levels"])
+            self.env = mate.MultiTarget(self.env, camera_agent=mate.agents.HeuristicCameraAgent(seed=0))
+        self.action_space_camera = self.env.action_space.spaces[0]
+        self.action_space_target = self.env.action_space.spaces[1]
 
-        self.observation_space_camera = GymDict({"obs": self.env.observation_space.spaces[0].spaces[0]})
-        self.observation_space_target = GymDict({"obs": self.env.observation_space.spaces[1].spaces[0]})
+        self.observation_space_camera = GymDict({"obs": self.env.observation_space.spaces[0]})
+        self.observation_space_target = GymDict({"obs": self.env.observation_space.spaces[1]})
 
         # for gym/rllib usage compatible purpose; not functioning in real use
-        self.observation_space = self.observation_space_camera
-        self.action_space = self.action_space_camera
+        self.observation_space = self.observation_space_target
+        self.action_space = self.action_space_target
 
-        self.agents_camera = ["camera_{}".format(i) for i in range(len(self.env.cameras))]
-        self.agents_target = ["target_{}".format(i) for i in range(len(self.env.targets))]
+        self.agents_camera = ["camera_{}".format(i) for i in range(self.env.num_opponents)]
+        self.agents_target = ["target_{}".format(i) for i in range(self.env.num_teammates)]
 
         self.agents = self.agents_camera + self.agents_target
         self.num_agents = len(self.agents)
         env_config["map_name"] = map
         self.env_config = env_config
+        print(f"self.env = {self.env}")
 
     def reset(self):
         original_obs = self.env.reset()
@@ -76,12 +85,13 @@ class RLlibMATE(MultiAgentEnv):
         action_camera = []
         for camera_name in self.agents_camera:
             action_camera.append(action_dict[camera_name])
-        action_camera = tuple(action_camera)
+        # action_camera = tuple(action_camera)
+        action_camera = np.array(action_camera)
         action_target = []
         for target_name in self.agents_target:
             action_target.append(action_dict[target_name])
-        action_target = tuple(action_target)
-
+        # action_target = tuple(action_target)
+        action_target = np.array(action_target)
         (
             (camera_joint_observation, target_joint_observation),
             (camera_team_reward, target_team_reward),
@@ -117,10 +127,12 @@ class RLlibMATE(MultiAgentEnv):
 
     def get_env_info(self):
         env_info = {
-            "space_obs_camera": self.observation_space_camera,
-            "space_act_camera": self.action_space_camera,
-            "space_obs_target": self.observation_space_target,
-            "space_act_target": self.action_space_target,
+            "space_obs": self.observation_space_target,
+            "space_act": self.action_space_target,
+            # "space_obs_camera": self.observation_space_camera,
+            # "space_act_camera": self.action_space_camera,
+            # "space_obs_target": self.observation_space_target,
+            # "space_act_target": self.action_space_target,
             "num_agents": self.num_agents,
             "agents": self.agents,
             "episode_limit": 2000,

@@ -58,6 +58,7 @@ class RLlibMATE_FCOOP(MultiAgentEnv):
         self.agents = ["agent_{}".format(i) for i in range(self.num_agents)]
         env_config["map_name"] = map
         self.env_config = env_config
+        # print(f"self.env = {self.env}")
 
     def reset(self):
         original_obs = self.env.reset()
